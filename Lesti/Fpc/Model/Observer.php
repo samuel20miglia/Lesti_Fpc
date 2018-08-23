@@ -39,8 +39,13 @@ class Observer
      * @var \Magento\Framework\Event\ManagerInterface
      */
     protected $_eventManager;
-    /**
-     */
+
+
+    protected $_coreSession;
+
+    protected $_helperMessages;
+
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Customer\Model\Session $customerSession,
@@ -53,8 +58,10 @@ class Observer
         \Magento\Framework\App\Cache $cache,
         \Lesti\Fpc\Helper\Data $helperData,
         \Lesti\Fpc\Helper\Block $helperBlock,
+        \Lesti\Fpc\Helper\Block\Messages $helperMessages,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Event\ManagerInterface $eventManager
+        \Magento\Framework\Event\ManagerInterface $eventManager,
+        \Magento\Framework\Session\SessionManagerInterface $coreSession
      )
     {
         $this->_cache = $cache;
@@ -63,6 +70,8 @@ class Observer
         $this->_customerSession = $customerSession;
         $this->_scopeConfig = $scopeConfig;
         $this->_eventManager = $eventManager;
+        $this->_coreSession = $coreSession;
+        $this->_helperMessages = $helperMessages;
     }
 
     /**
@@ -144,7 +153,7 @@ class Observer
                 if (in_array($fullActionName, $cacheableActions)) {
                     $key = $this->_helperData->getKey();
                     $body = $observer->getEvent()->getResponse()->getBody();
-                    $session = Mage::getSingleton('core/session');
+                    $session = $this->_coreSession;
                     $formKey = $session->getFormKey();
                     if ($formKey) {
                         $body = str_replace(
@@ -192,21 +201,21 @@ class Observer
     {
         if ($this->_getFpc()->isActive() &&
             !$this->_cached &&
-            Mage::helper('fpc')->canCacheRequest()) {
-                $fullActionName = Mage::helper('fpc')->getFullActionName();
+            $this->_helperData->canCacheRequest()) {
+                $fullActionName = $this->_helperData->getFullActionName();
                 $block = $observer->getEvent()->getBlock();
                 $blockName = $block->getNameInLayout();
-                $dynamicBlocks = Mage::helper('fpc/block')->getDynamicBlocks();
-                $lazyBlocks = Mage::helper('fpc/block')->getLazyBlocks();
+                $dynamicBlocks = $this->_helperBlock->getDynamicBlocks();
+                $lazyBlocks = $this->_helperBlock->getLazyBlocks();
                 $dynamicBlocks = array_merge($dynamicBlocks, $lazyBlocks);
-                $cacheableActions = Mage::helper('fpc')->getCacheableActions();
+                $cacheableActions = $this->_helperData->getCacheableActions();
                 if (in_array($fullActionName, $cacheableActions)) {
                     $this->_cacheTags = array_merge(
-                        Mage::helper('fpc/block')->getCacheTags($block),
+                        $this->_helperBlock->getCacheTags($block),
                         $this->_cacheTags
                         );
                     if (in_array($blockName, $dynamicBlocks)) {
-                        $placeholder = Mage::helper('fpc/block')
+                        $placeholder = $this->_helperBlock
                         ->getPlaceholderHtml($blockName);
                         $html = $observer->getTransport()->getHtml();
                         $this->_html[] = $html;
@@ -220,12 +229,12 @@ class Observer
     public function controllerActionPostdispatch()
     {
         if ($this->_getFpc()->isActive()) {
-            $fullActionName = Mage::helper('fpc')->getFullActionName();
+            $fullActionName = $this->_helperData->getFullActionName();
             if (in_array(
                 $fullActionName,
-                Mage::helper('fpc')->getRefreshActions()
+                $this->_helperData->getRefreshActions()
                 )) {
-                    $session = Mage::getSingleton('customer/session');
+                    $session = $this->_customerSession;
                     $session->setData(
                         Block::LAZY_BLOCKS_VALID_SESSION_PARAM,
                         false
@@ -239,7 +248,9 @@ class Observer
      */
     protected function _getFpc()
     {
-        return ;
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+        return $objectManager->get('Lesti\Fpc\Model\Fpc');
     }
 
     /**
@@ -248,14 +259,14 @@ class Observer
      * @return Mage_Core_Model_Layout
      */
     protected function _prepareLayout(
-        Mage_Core_Model_Layout $layout,
+        \Magento\Framework\View\Layout $layout,
         array $dynamicBlocks
         )
     {
         $xml = $layout->getNode();
         $cleanXml = simplexml_load_string(
             '<layout/>',
-            Lesti_Fpc_Helper_Data::LAYOUT_ELEMENT_CLASS
+            $this->_helperData::LAYOUT_ELEMENT_CLASS
             );
         $types = array('block', 'reference', 'action');
         foreach ($dynamicBlocks as $blockName) {
@@ -270,13 +281,13 @@ class Observer
         }
         $layout->setXml($cleanXml);
         $layout->generateBlocks();
-        return Mage::helper('fpc/block_messages')
+        return $this->_helperMessages
         ->initLayoutMessages($layout);
     }
 
     protected function _replaceFormKey()
     {
-        $coreSession = Mage::getSingleton('core/session');
+        $coreSession = $this->_coreSession;
         $formKey = $coreSession->getFormKey();
         if ($formKey) {
             $this->_placeholder[] = self::FORM_KEY_PLACEHOLDER;
@@ -291,8 +302,8 @@ class Observer
      * @param array $lazyBlocks
      */
     protected function _insertDynamicBlocks(
-        Mage_Core_Model_Layout &$layout,
-        Mage_Customer_Model_Session &$session,
+        \Magento\Framework\View\Layout &$layout,
+        \Magento\Customer\Model\Session &$session,
         array &$dynamicBlocks,
         array &$lazyBlocks
         )
@@ -300,7 +311,7 @@ class Observer
         foreach ($dynamicBlocks as $blockName) {
             $block = $layout->getBlock($blockName);
             if ($block) {
-                $this->_placeholder[] = Mage::helper('fpc/block')
+                $this->_placeholder[] = $this->_helperBlock
                 ->getPlaceholderHtml($blockName);
                 $html = $block->toHtml();
                 if (in_array($blockName, $lazyBlocks)) {
