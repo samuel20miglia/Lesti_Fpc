@@ -12,14 +12,14 @@ Simple Magento Fullpagecache. The current documentation can be found
 
 Several quick start options are available:
 ### Install manually
-  * [Download the latest release](https://github.com/GordonLesti/Lesti_Fpc/releases/latest)
+  * [Download the latest release](https://github.com/samuel20miglia/Lesti_Fpc/releases/latest)
   * Unzip
   * Copy `app` directory into Magento
 
 ### Install with [modman](https://github.com/colinmollenhour/modman)
 
 ```bash
-modman clone https://github.com/GordonLesti/Lesti_Fpc.git
+modman clone https://github.com/samuel20miglia/Lesti_Fpc.git
 ```
 
 ### Install with [Magento Composer Installer](https://github.com/Cotya/magento-composer-installer)
