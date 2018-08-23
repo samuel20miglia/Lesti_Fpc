@@ -56,7 +56,7 @@ class Messages extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected $_themeProvider;
 
-    protected messageManager;
+    protected $messageManager;
 
     /**
      * @param \Magento\Framework\App\Helper\Context $context
