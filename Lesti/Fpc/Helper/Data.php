@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Copyright © Lesti, All rights reserved.
  * See COPYING.txt for license details.
@@ -138,7 +139,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         if (!$this->_registry->registry(self::REGISTRY_KEY_PARAMS)) {
             $request = $this->request->getRequest();
-            
+
             $params = array('host' => $request->getServer('HTTP_HOST'),
                 'port' => $request->getServer('SERVER_PORT'),
                 'secure' =>  $this->_storeManager->getStore()->isCurrentlySecure(),

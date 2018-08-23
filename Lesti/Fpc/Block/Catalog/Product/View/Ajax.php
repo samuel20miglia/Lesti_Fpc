@@ -1,5 +1,6 @@
 <?php
 declare(strict_types = 1);
+
 namespace Lesti\Fpc\Block\Catalog\Product\View;
 
 use \Magento\Framework\View\Element\Template;
@@ -26,19 +27,28 @@ class Ajax extends Template
 
     protected $_fpc;
 
+    protected $_helperData;
+
+    protected $_helperBlock;
+
     /**
-     * ...
-     * ...
      *
-     * @param \Magento\Framework\Registry $registry,
+     * @param \Magento\Framework\Registry $registry
+     * @param Lesti\Fpc\Model\Fpc $fpc
+     * @param Lesti\Fpc\Helper\Data $helperData
+     * @param Lesti\Fpc\Helper\Block $helperBlock
      */
     public function __construct(
         \Magento\Framework\Registry $registry,
-        Lesti\Fpc\Model\Fpc $fpc
+        Lesti\Fpc\Model\Fpc $fpc,
+        Lesti\Fpc\Helper\Data $helperData,
+        Lesti\Fpc\Helper\Block $helperBlock
         )
     {
         $this->_registry = $registry;
         $this->_fpc = $fpc;
+        $this->_helperData = $helperData;
+        $this->_helperBlock = $helperBlock;
     }
 
     /**
@@ -47,12 +57,13 @@ class Ajax extends Template
      */
     public function getAjaxUrl()
     {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
         $id = $this->_getProductId();
         if ($this->_fpc->isActive()
-            && in_array('catalog_product_view', Mage::helper('fpc')->getCacheableActions())
-            && Mage::helper('fpc/block')->useRecentlyViewedProducts()
+            && in_array('catalog_product_view', $this->_helperData->getCacheableActions())
+            && $this->_helperBlock->useRecentlyViewedProducts()
             && $id) {
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
             return $this->getUrl('fpc/catalog_product/view', array(
                 'id' => $id,
                 '_secure' => $objectManager->getStore()

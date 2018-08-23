@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Copyright © Lesti, All rights reserved.
  * See COPYING.txt for license details.
@@ -171,7 +172,7 @@ class Block extends \Magento\Framework\App\Helper\AbstractHelper
         );
 
         $design = $this->_themeProvider->getThemeById($themeId);
-        
+
         $params['design'] = $design->getPackageName().'_'.
             $design->getTheme('template');
 
