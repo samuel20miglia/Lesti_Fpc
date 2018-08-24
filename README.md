@@ -23,11 +23,11 @@ modman clone https://github.com/samuel20miglia/Lesti_Fpc.git
 ```
 
 ### Install with [Magento Composer Installer](https://github.com/Cotya/magento-composer-installer)
-  * add the requirement `gordonlesti/lesti_fpc`
+  * add the requirement `samuel20miglia/lesti_fpc`
 ```json
 {
     "require": {
-        "gordonlesti/lesti_fpc": "*"
+        "samuel20miglia/lesti_fpc": "*"
     }
 }
 ```
@@ -58,8 +58,8 @@ The Open Software License v. 3.0 (OSL-3.0). Please see [License File](LICENSE.md
 [ico-travis]: https://img.shields.io/travis/GordonLesti/Lesti_Fpc/master.svg?style=flat-square
 [ico-coverall]: https://img.shields.io/coveralls/GordonLesti/Lesti_Fpc/master.svg?style=flat-square
 
-[link-release]: https://github.com/GordonLesti/Lesti_Fpc/releases/latest
+[link-release]: https://github.com/samuel20miglia/Lesti_Fpc/releases/latest
 [link-travis]: https://travis-ci.org/GordonLesti/Lesti_Fpc
 [link-coveralls]: https://coveralls.io/r/GordonLesti/Lesti_Fpc
-[link-author]: https://gordonlesti.com/
+[link-author]: http://samuelventimiglia.it/
 [link-contributors]: ../../contributors
