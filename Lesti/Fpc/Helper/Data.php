@@ -1,24 +1,22 @@
 <?php
-declare(strict_types=1);
 /**
- * Copyright © Lesti, All rights reserved.
- * See COPYING.txt for license details.
+ * Lesti_Fpc (http:gordonlesti.com/lestifpc)
+ *
+ * PHP version 5
+ *
+ * @link      https://github.com/GordonLesti/Lesti_Fpc
+ * @package   Lesti_Fpc
+ * @author    Gordon Lesti <info@gordonlesti.com>
+ * @copyright Copyright (c) 2013-2016 Gordon Lesti (http://gordonlesti.com)
+ * @license   http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
 
 namespace Lesti\Fpc\Helper;
 
-use Magento\Contact\Model\ConfigInterface;
-use Magento\Customer\Api\Data\CustomerInterface;
-use Magento\Framework\App\ObjectManager;
-use Magento\Framework\App\Request\DataPersistorInterface;
-
 /**
- * Contact base helper
- *
- * @deprecated 100.2.0
- * @see \Magento\Contact\Model\ConfigInterface
+ * Class Lesti_Fpc_Helper_Data
  */
-class Data extends \Magento\Framework\App\Helper\AbstractHelper
+class Data extends \Lesti_Fpc_Helper_Abstract
 {
     const XML_PATH_CACHEABLE_ACTIONS = 'system/fpc/cache_actions';
     const XML_PATH_BYPASS_HANDLES = 'system/fpc/bypass_handles';
@@ -29,6 +27,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_MISS_URI_PARAMS = 'system/fpc/miss_uri_params';
     const LAYOUT_ELEMENT_CLASS = 'Mage_Core_Model_Layout_Element';
     const CACHE_KEY_LAYERED_NAVIGATION_ATTRIBUTES = 'layeredNavigationAttributes';
+
     const REGISTRY_KEY_PARAMS = 'fpc_params';
 
     // List of pages that contain layered navigation
@@ -39,66 +38,57 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     );
 
     /**
-     * Customer session
-     *
-     * @var \Magento\Customer\Model\Session
+     * @var \Magento\Framework\Registry
      */
-    protected $_customerSession;
+    protected $registry;
 
     /**
-     * @var DataPersistorInterface
+     * @var \Magento\Framework\App\Request\Http
      */
-    private $dataPersistor;
-
-    /**
-     * @var array
-     */
-    private $postData = null;
-
-    protected $_registry;
-
     protected $request;
 
-    protected $response;
-
-    protected $_storeManager;
-
     /**
-   * @var EventManager
-   */
-    protected $_eventManager;
-
-    protected $_attributeFactory;
-
-    protected $cache;
-
-    /**
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Customer\Model\Session $customerSession
-     * @param CustomerViewHelper $customerViewHelper
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
+    protected $storeManager;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
+     * @var \Magento\Framework\Event\ManagerInterface
+     */
+    protected $eventManager;
+
+    /**
+     * @var \Magento\Framework\View\LayoutInterface
+     */
+    protected $layout;
+
+    /**
+     * @var \Magento\Framework\DataObjectFactory
+     */
+    protected $dataObjectFactory;
+
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Request\Http $request,
-        \Magento\Framework\App\Response\Http $response,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Event\Manager $eventManager,
-        \Magento\Catalog\Model\ResourceModel\Eav\Attribute $attributeFactory,
-        \Magento\Framework\App\Cache $cache
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\Event\ManagerInterface $eventManager,
+        \Magento\Framework\View\LayoutInterface $layout,
+        \Magento\Framework\DataObjectFactory $dataObjectFactory
     ) {
-        $this->_customerSession = $customerSession;
-        $this->_registry = $registry;
+        $this->dataObjectFactory = $dataObjectFactory;
+        $this->registry = $registry;
         $this->request = $request;
-        $this->response = $response;
-        $this->_storeManager = $storeManager;
-        $this->_eventManager = $eventManager;
-        $this->_attributeFactory = $attributeFactory;
-        $this->cache = $cache;
-        parent::__construct($context);
+        $this->storeManager = $storeManager;
+        $this->scopeConfig = $scopeConfig;
+        $this->eventManager = $eventManager;
+        $this->layout = $layout;
     }
-
     /**
      * @return array
      */
@@ -137,18 +127,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function _getParams()
     {
-        if (!$this->_registry->registry(self::REGISTRY_KEY_PARAMS)) {
-            $request = $this->request->getRequest();
-
+        if (!$this->registry->registry(self::REGISTRY_KEY_PARAMS)) {
+            $request = $this->request;
             $params = array('host' => $request->getServer('HTTP_HOST'),
                 'port' => $request->getServer('SERVER_PORT'),
-                'secure' =>  $this->_storeManager->getStore()->isCurrentlySecure(),
+                'secure' => $this->storeManager->getStore()->isCurrentlySecure(),
                 'full_action_name' => $this->getFullActionName(),
                 'ajax' => $request->isAjax(),
-            );
-
+              );
             $uriParams = $this->_getUriParams();
-
             foreach ($request->getParams() as $requestParam =>
                      $requestParamValue) {
                 if (!$requestParamValue) {
@@ -161,74 +148,25 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     }
                 }
             }
-            if ($this->getConfigs(self::XML_PATH_CUSTOMER_GROUPS)) {
-                $params['customer_group_id'] = $this->_customerSession->getCustomer()->getGroupId();
+            if ($this->scopeConfig->getValue(self::XML_PATH_CUSTOMER_GROUPS, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
+                $customerSession = Mage::getSingleton('customer/session');
+                $params['customer_group_id'] = $customerSession
+                    ->getCustomerGroupId();
             }
 
             // edit parameters via event
-            $parameters = new \Magento\Framework\DataObject();
+            $parameters = $this->dataObjectFactory->create();
             $parameters->setValue($params);
-            $this->_eventManager->dispatch(
+            $this->eventManager->dispatch(
                 'fpc_helper_collect_params',
                 array('parameters' => $parameters)
             );
             $params = $parameters->getValue();
 
 
-            $this->_registry->register(self::REGISTRY_KEY_PARAMS, serialize($params));
+            $this->registry->register(self::REGISTRY_KEY_PARAMS, serialize($params));
         }
-        return $this->_registry->registry(self::REGISTRY_KEY_PARAMS);
-    }
-
-
-    public function getCSStoreConfigs($path)
-    {
-        $configs = $this->scopeConfig->getValue(
-            $path,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-
-        if ($configs) {
-            return array_unique(array_map('trim', explode(',', $configs)));
-        }
-
-        return array();
-    }
-
-    public function getConfigs($path)
-    {
-        return $this->scopeConfig->getValue(
-            $path,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-    }
-
-    /**
-     * @return string
-     */
-    public function getFullActionName()
-    {
-        $delimiter = '_';
-        $request = $this->request->getRequest();
-        return $request->getRequestedRouteName() . $delimiter .
-        $request->getRequestedControllerName() . $delimiter .
-        $request->getRequestedActionName();
-    }
-
-    /**
-     * @return array
-     */
-    public function _getUriParams()
-    {
-        $configParams = $this->getCSStoreConfigs(self::XML_PATH_URI_PARAMS);
-
-        if ($this->getConfigs(self::XML_PATH_URI_PARAMS_LAYERED_NAVIGATION)) {
-            $layeredNavigationParams = $this->_getLayeredNavigationAttributes();
-        } else {
-            $layeredNavigationParams = array();
-        }
-
-        return array_merge($configParams, $layeredNavigationParams);
+        return $this->registry->registry(self::REGISTRY_KEY_PARAMS);
     }
 
     /**
@@ -250,53 +188,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @param Mage_Core_Controller_Response_Http $response
-     * @return string
-     */
-    public function getContentType()
-    {
-        foreach ($this->response->getHeaders() as $header) {
-            if (isset($header['name']) && $header['name'] === 'Content-Type' && isset($header['value'])) {
-                return $header['value'];
-            }
-        }
-        return 'text/html; charset=UTF-8';
-    }
-
-    /**
-     * @return bool
-     */
-    public function canCacheRequest()
-    {
-        $request = $this->request->getRequest();
-        if (strtoupper($request->getMethod()) != 'GET') {
-            return false;
-        }
-        $missParams = $this->_getMissUriParams();
-        foreach ($missParams as $missParam) {
-            $pair = array_map('trim', explode('=', $missParam));
-            $key = $pair[0];
-            $param = $request->getParam($key);
-            if ($param && isset($pair[1]) && preg_match($pair[1], $param)) {
-                return false;
-            }
-        }
-
-        $handles = $this->request->getFullActionName();
-        foreach ($this->getBypassHandles() as $handle) {
-            if (in_array($handle, $handles)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * @return array
      */
-    protected function _getMissUriParams()
+    public function _getUriParams()
     {
-        return $this->getCSStoreConfigs(self::XML_PATH_MISS_URI_PARAMS);
+        $configParams = $this->getCSStoreConfigs(self::XML_PATH_URI_PARAMS);
+
+        if ($this->scopeConfig->getValue(self::XML_PATH_URI_PARAMS_LAYERED_NAVIGATION, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
+            $layeredNavigationParams = $this->_getLayeredNavigationAttributes();
+        } else {
+            $layeredNavigationParams = array();
+        }
+
+        return array_merge($configParams, $layeredNavigationParams);
     }
 
     /**
@@ -311,8 +215,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $currentFullActionName = $this->getFullActionName();
         if (in_array($currentFullActionName, self::$_pagesWithLayeredNavigation)) {
-            /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection $attributeCollection */
-            $attributeCollection = $this->_attributeFactory->getCollection();
+            /** @var \Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection $attributeCollection */
+            $attributeCollection = Mage::getResourceModel('catalog/product_attribute_collection');
 
             // The category and search pages may have different filterable attributes, based on how the attributes
             // are configured
@@ -326,21 +230,86 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $filterableField = 'is_filterable';
             }
 
+            $cache = Mage::app()->getCache();
             $cacheId = self::CACHE_KEY_LAYERED_NAVIGATION_ATTRIBUTES.'_'.$filterableField;
             $cacheTags = array('FPC', self::CACHE_KEY_LAYERED_NAVIGATION_ATTRIBUTES);
-            $layeredNavigationAttributesCache = $this->cache->load($cacheId);
+            $layeredNavigationAttributesCache = $cache->load($cacheId);
 
             if (!$layeredNavigationAttributesCache) {
                 $attributeCollection->addFieldToFilter($filterableField, array('in' => array(1,2)));
                 foreach ($attributeCollection as $attribute) {
                     $layeredNavigationAttributes[] = $attribute->getAttributeCode();
                 }
-                $this->cache->save(serialize($layeredNavigationAttributes), $cacheId, $cacheTags);
+                $cache->save(serialize($layeredNavigationAttributes), $cacheId, $cacheTags);
             } else {
                 $layeredNavigationAttributes = unserialize($layeredNavigationAttributesCache);
             }
         }
 
         return $layeredNavigationAttributes;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getMissUriParams()
+    {
+        return $this->getCSStoreConfigs(self::XML_PATH_MISS_URI_PARAMS);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canCacheRequest()
+    {
+        $request = $this->request;
+        if (strtoupper($request->getMethod()) != 'GET') {
+            return false;
+        }
+        $missParams = $this->_getMissUriParams();
+        foreach ($missParams as $missParam) {
+            $pair = array_map('trim', explode('=', $missParam));
+            $key = $pair[0];
+            $param = $request->getParam($key);
+            if ($param && isset($pair[1]) && preg_match($pair[1], $param)) {
+                return false;
+            }
+        }
+
+        $handles = $this->layout->getUpdate()->getHandles();
+        foreach ($this->getBypassHandles() as $handle) {
+            if (in_array($handle, $handles)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFullActionName()
+    {
+        $delimiter = '_';
+        $request = $this->request;
+        return $request->getRequestedRouteName() . $delimiter .
+        $request->getRequestedControllerName() . $delimiter .
+        $request->getRequestedActionName();
+    }
+
+    /**
+     * @param \Magento\Framework\App\Response\Http $response
+     * @return string
+     */
+    public function getContentType(\Magento\Framework\App\Response\Http $response)
+    {
+        foreach ($response->getHeaders() as $header) {
+            if (isset($header['name']) && $header['name'] === 'Content-Type' && isset($header['value'])) {
+                return $header['value'];
+            }
+        }
+
+        return 'text/html; charset=UTF-8';
     }
 }

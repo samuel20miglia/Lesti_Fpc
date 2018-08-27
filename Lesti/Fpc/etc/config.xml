@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <system>
+            <fpc>
+                <cache_actions>cms_index_index,
+cms_page_view,
+catalog_product_view,
+catalog_category_view</cache_actions>
+                <dynamic_blocks>global_messages,
+messages,
+global_notices,
+global_cookie_notice,
+right.reports.product.viewed</dynamic_blocks>
+                <refresh_actions>checkout_cart_add,
+checkout_cart_delete,
+checkout_cart_updatePost,
+checkout_cart_ajaxDelete,
+checkout_cart_ajaxUpdate,
+checkout_cart_updateItemOptions,
+catalog_product_compare_add,
+catalog_product_compare_clear,
+catalog_product_compare_remove,
+wishlist_index_add,
+wishlist_index_remove,
+wishlist_index_update,
+wishlist_index_allcart,
+wishlist_index_configure,
+checkout_onepage_success,
+customer_account_login,
+poll_vote_add</refresh_actions>
+                <lazy_blocks>top.links,
+cart_sidebar,
+catalog.compare.sidebar,
+right.reports.product.compared,
+wishlist_sidebar,
+welcome,
+minicart_head,
+right.poll</lazy_blocks>
+                <uri_params>id,
+category,
+cat,
+page_id,
+p,
+limit,
+dir,
+order,
+mode,
+/utm_.*/,
+gclid,
+gclsrc</uri_params>
+                <uri_params_layered_navigation>1</uri_params_layered_navigation>
+                <miss_uri_params>no_cache=/^1$/,
+limit=/^([0-9]+)|(all)$/,
+dir=/^[0-9a-z_]+$/,
+order=/^[0-9a-z_]+$/,
+mode=/^[0-9a-z_]+$/,
+___store=/^[a-z]{1}[0-9a-z_]*$/</miss_uri_params>
+                <session_params>limit_page,
+sort_order,
+sort_direction,
+display_mode</session_params>
+                <customer_groups>0</customer_groups>
+                <use_recently_viewed_products>0</use_recently_viewed_products>
+                <show_age>1</show_age>
+                <gzcompress_level>-2</gzcompress_level>
+            </fpc>
+        </system>
+    </default>
+</config>

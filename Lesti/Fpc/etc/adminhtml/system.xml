@@ -1,72 +1,64 @@
 <?xml version="1.0"?>
-<!--
-/**
- * Copyright © Lesti, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
-    <system>
-        <section id="system">
-            <group id="fpc" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="200">
-                <label>Lesti FPC</label>
-                <field id="cache_actions" type="textarea" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Cachable actions</label>
-                    <comment>All cachable Actions, separated with Comma</comment>
-                </field>
-                <field id="dynamic_blocks" type="textarea" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Dynamic Blocks</label>
-                    <comment>All dynamic Blocks, separated with Comma</comment>
-                </field>
-                <field id="refresh_actions" type="textarea" translate="label comment" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Refresh Actions</label>
-                    <comment>All Action to refresh lazy blocks, separated with Comma</comment>
-                </field>
-                <field id="bypass_handles" type="textarea" translate="label comment" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Bypass Handles</label>
-                    <comment>All layout handles to bypass FPC, separated with Comma</comment>
-                </field>
-                <field id="lazy_blocks" type="textarea" translate="label comment" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Lazy Blocks</label>
-                    <comment>All lazy Blocks, separated with Comma</comment>
-                </field>
-                <field id="uri_params" type="textarea" translate="label comment" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Uri Params</label>
-                    <comment>All Uri Params, separated with Comma. Params enclosed with "/" are treated as regular expression</comment>
-                </field>
-                <field id="uri_params_layered_navigation" type="select" translate="label comment" sortOrder="52" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Add Layered Navigation Attributes To Uri Params</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>If set to yes, all attributes that are set to show in the layered navigation will automatically get added to the list of Uri Params.</comment>
-                </field>
-                <field id="miss_uri_params" type="textarea" translate="label comment" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Miss Uri Params</label>
-                    <comment>Ignore Requests with this parameters. Regex separated with comma</comment>
-                </field>
-                <field id="session_params" type="textarea" translate="label comment" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Category Session Params</label>
-                    <comment>All Session Params, separated with comma. Works only on category pages</comment>
-                </field>
-                <field id="customer_groups" type="select" translate="label comment" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Customer Group Caching</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Only enable if you have different price or layout for different customer groups</comment>
-                </field>
-                <field id="use_recently_viewed_products" type="select" translate="label comment" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Use Recently Viewed Products</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="show_age" type="select" translate="label comment" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Show Age</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Show the age of a page in header</comment>
-                </field>
-                <field id="gzcompress_level" type="select" translate="label comment" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>gzcompress Level</label>
-                    <source_model>Lesti\Fpc\Model\System\Config\Source\Gzcompress</source_model>
-                    <comment>Compress the cache (only for filecache, flush Lesti_Fpc after changing value)</comment>
-                </field>
-            </group>
-        </section>
-    </system>
+    <section id="system">
+        <group id="fpc" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Lesti FPC</label>
+            <field id="cache_actions">
+                <label>Cachable actions</label>
+                <comment>All cachable Actions, separated with Comma</comment>
+            </field>
+            <field id="dynamic_blocks">
+                <label>Dynamic Blocks</label>
+                <comment>All dynamic Blocks, separated with Comma</comment>
+            </field>
+            <field id="refresh_actions">
+                <label>Refresh Actions</label>
+                <comment>All Action to refresh lazy blocks, separated with Comma</comment>
+            </field>
+            <field id="bypass_handles">
+                <label>Bypass Handles</label>
+                <comment>All layout handles to bypass FPC, separated with Comma</comment>
+            </field>
+            <field id="lazy_blocks">
+                <label>Lazy Blocks</label>
+                <comment>All lazy Blocks, separated with Comma</comment>
+            </field>
+            <field id="uri_params">
+                <label>Uri Params</label>
+                <comment>All Uri Params, separated with Comma. Params enclosed with "/" are treated as regular expression.</comment>
+            </field>
+            <field id="uri_params_layered_navigation">
+                <label>Add Layered Navigation Attributes To Uri Params</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+                <comment>If set to yes, all attributes that are set to show in the layered navigation will automatically get added to the list of Uri Params.</comment>
+            </field>
+            <field id="miss_uri_params">
+                <label>Miss Uri Params</label>
+                <comment>Ignore Requests with this parameters. Regex separated with comma.</comment>
+            </field>
+            <field id="session_params">
+                <label>Category Session Params</label>
+                <comment>All Session Params, separated with comma. Works only on category pages.</comment>
+            </field>
+            <field id="customer_groups">
+                <label>Customer Group Caching</label>
+                <comment>Only enable if you have different price or layout for different customer groups.</comment>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+            </field>
+            <field id="use_recently_viewed_products">
+                <label>Use Recently Viewed Products</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+            </field>
+            <field id="show_age">
+                <label>Show Age</label>
+                <comment>Show the age of a page in header</comment>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+            </field>
+            <field id="gzcompress_level">
+                <label>gzcompress Level</label>
+                <comment>Compress the cache (only for filecache, flush Lesti_Fpc after changing value)</comment>
+                <source_model>fpc/adminhtml_system_config_source_gzcompress</source_model>
+            </field>
+        </group>
+    </section>
 </config>

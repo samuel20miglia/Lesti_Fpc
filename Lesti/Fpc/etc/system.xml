@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Lesti_Fpc (http:gordonlesti.com/lestifpc)
+ *
+ * PHP version 5
+ *
+ * @link      https://github.com/GordonLesti/Lesti_Fpc
+ * @package   Lesti_Fpc
+ * @author    Gordon Lesti <info@gordonlesti.com>
+ * @copyright Copyright (c) 2013-2016 Gordon Lesti (http://gordonlesti.com)
+ * @license   http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
+ */
+-->
+<config>
+    <sections>
+        <system>
+            <groups>
+                <fpc>
+                    <label>Lesti FPC</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>200</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <cache_actions>
+                            <label>Cachable actions</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>All cachable Actions, separated with Comma</comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </cache_actions>
+                        <dynamic_blocks>
+                            <label>Dynamic Blocks</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>All dynamic Blocks, separated with Comma</comment>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </dynamic_blocks>
+                        <refresh_actions>
+                            <label>Refresh Actions</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>All Action to refresh lazy blocks, separated with Comma</comment>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </refresh_actions>
+                        <bypass_handles>
+                            <label>Bypass Handles</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>All layout handles to bypass FPC, separated with Comma</comment>
+                            <sort_order>35</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </bypass_handles>
+                        <lazy_blocks>
+                            <label>Lazy Blocks</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>All lazy Blocks, separated with Comma</comment>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </lazy_blocks>
+                        <uri_params>
+                            <label>Uri Params</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>All Uri Params, separated with Comma. Params enclosed with "/" are treated as regular expression.</comment>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </uri_params>
+                        <uri_params_layered_navigation>
+                            <label>Add Layered Navigation Attributes To Uri Params</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment>If set to yes, all attributes that are set to show in the layered navigation will automatically get added to the list of Uri Params.</comment>
+                            <sort_order>52</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </uri_params_layered_navigation>
+                        <miss_uri_params>
+                            <label>Miss Uri Params</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>Ignore Requests with this parameters. Regex separated with comma.</comment>
+                            <sort_order>55</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </miss_uri_params>
+                        <session_params>
+                            <label>Category Session Params</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>All Session Params, separated with comma. Works only on category pages.</comment>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </session_params>
+                        <customer_groups>
+                            <label>Customer Group Caching</label>
+                            <frontend_type>select</frontend_type>
+                            <comment>Only enable if you have different price or layout for different customer groups.</comment>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </customer_groups>
+                        <use_recently_viewed_products>
+                            <label>Use Recently Viewed Products</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_recently_viewed_products>
+                        <show_age>
+                            <label>Show Age</label>
+                            <frontend_type>select</frontend_type>
+                            <comment>Show the age of a page in header</comment>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </show_age>
+                        <gzcompress_level>
+                            <label>gzcompress Level</label>
+                            <frontend_type>select</frontend_type>
+                            <comment>Compress the cache (only for filecache, flush Lesti_Fpc after changing value)</comment>
+                            <source_model>fpc/adminhtml_system_config_source_gzcompress</source_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </gzcompress_level>
+                    </fields>
+                </fpc>
+            </groups>
+        </system>
+    </sections>
+</config>

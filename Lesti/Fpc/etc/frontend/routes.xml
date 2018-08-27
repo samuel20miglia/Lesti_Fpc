@@ -1,11 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
-    <!--Use router 'admin' for admin route -->
     <router id="standard">
-        <!--Define a custom route with id and frontName -->
-        <route id="fpc" frontName="fpc">
-            <!--The module which this route match to-->
-            <module name="Lesti_Fpc"/>
-        </route>
+        <route id="fpc" frontName="fpc"/>
     </router>
 </config>

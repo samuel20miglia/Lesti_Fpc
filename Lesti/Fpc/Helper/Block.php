@@ -1,24 +1,22 @@
 <?php
-declare(strict_types=1);
 /**
- * Copyright © Lesti, All rights reserved.
- * See COPYING.txt for license details.
+ * Lesti_Fpc (http:gordonlesti.com/lestifpc)
+ *
+ * PHP version 5
+ *
+ * @link      https://github.com/GordonLesti/Lesti_Fpc
+ * @package   Lesti_Fpc
+ * @author    Gordon Lesti <info@gordonlesti.com>
+ * @copyright Copyright (c) 2013-2016 Gordon Lesti (http://gordonlesti.com)
+ * @license   http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
 
 namespace Lesti\Fpc\Helper;
 
-use Magento\Contact\Model\ConfigInterface;
-use Magento\Customer\Api\Data\CustomerInterface;
-use Magento\Framework\App\ObjectManager;
-use Magento\Framework\App\Request\DataPersistorInterface;
-
 /**
- * Contact base helper
- *
- * @deprecated 100.2.0
- * @see \Magento\Contact\Model\ConfigInterface
+ * Class Lesti_Fpc_Helper_Block
  */
-class Block extends \Magento\Framework\App\Helper\AbstractHelper
+class Block extends \Lesti_Fpc_Helper_Abstract
 {
     const DYNAMIC_BLOCKS_XML_PATH = 'system/fpc/dynamic_blocks';
     const LAZY_BLOCKS_XML_PATH = 'system/fpc/lazy_blocks';
@@ -27,92 +25,29 @@ class Block extends \Magento\Framework\App\Helper\AbstractHelper
         'system/fpc/use_recently_viewed_products';
 
     /**
-     * Customer session
-     *
-     * @var \Magento\Customer\Model\Session
+     * @var \Magento\Framework\App\Request\Http
      */
-    protected $_customerSession;
-
-    /**
-     * @var DataPersistorInterface
-     */
-    private $dataPersistor;
-
-    /**
-     * @var array
-     */
-    private $postData = null;
-
-    protected $_registry;
-
     protected $request;
 
-    protected $response;
-
-    protected $_storeManager;
-
     /**
-   * @var EventManager
-   */
-    protected $_eventManager;
-
-    protected $_attributeFactory;
-
-    protected $cache;
-
-    protected $_themeProvider;
-
-    /**
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Customer\Model\Session $customerSession
-     * @param CustomerViewHelper $customerViewHelper
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
+    protected $storeManager;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Request\Http $request,
-        \Magento\Framework\App\Response\Http $response,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Event\Manager $eventManager,
-        \Magento\Catalog\Model\ResourceModel\Eav\Attribute $attributeFactory,
-        \Magento\Framework\App\Cache $cache,
-        \Magento\Framework\View\Design\Theme\ThemeProviderInterface $themeProvider
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
-        $this->_customerSession = $customerSession;
-        $this->_registry = $registry;
         $this->request = $request;
-        $this->response = $response;
-        $this->_storeManager = $storeManager;
-        $this->_eventManager = $eventManager;
-        $this->_attributeFactory = $attributeFactory;
-        $this->cache = $cache;
-        $this->_themeProvider = $themeProvider;
-        parent::__construct($context);
+        $this->storeManager = $storeManager;
+        $this->scopeConfig = $scopeConfig;
     }
-
-    public function getCSStoreConfigs($path)
-    {
-        $configs = $this->scopeConfig->getValue(
-            $path,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-
-        if ($configs) {
-            return array_unique(array_map('trim', explode(',', $configs)));
-        }
-
-        return array();
-    }
-
-    public function getConfigs($path)
-    {
-        return $this->scopeConfig->getValue(
-            $path,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-    }
-
     /**
      * @return array
      */
@@ -135,7 +70,8 @@ class Block extends \Magento\Framework\App\Helper\AbstractHelper
     public function areLazyBlocksValid()
     {
         $hash = $this->_getLazyBlocksValidHash();
-        $sessionHash = $this->_customerSession->getData(self::LAZY_BLOCKS_VALID_SESSION_PARAM);
+        $session = Mage::getSingleton('customer/session');
+        $sessionHash = $session->getData(self::LAZY_BLOCKS_VALID_SESSION_PARAM);
         if ($sessionHash === false || $hash != $sessionHash) {
             $session->setData(self::LAZY_BLOCKS_VALID_SESSION_PARAM, $hash);
             return false;
@@ -149,30 +85,22 @@ class Block extends \Magento\Framework\App\Helper\AbstractHelper
     protected function _getLazyBlocksValidHash()
     {
         $params = array();
-        $request = $this->request->getRequest();
+        $request = $this->request;
         $params['host'] = $request->getServer('HTTP_HOST');
         $params['port'] = $request->getServer('SERVER_PORT');
         // store
-        $storeCode = $this->_storeManager->getStore()->getCode();
+        $storeCode = $this->storeManager->getStore()->getCode();
         if ($storeCode) {
             $params['store'] = $storeCode;
         }
         // currency
-        $currencyCode = $this->_storeManager->getStore()->getCurrentCurrencyCode();
+        $currencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
         if ($currencyCode) {
             $params['currency'] = $currencyCode;
         }
-        $params['customer_group_id'] = $this->_customerSession->getCustomer()->getGroupId();
-
-
-        $themeId = $this->_scopeConfig->getValue(
-            \Magento\Framework\View\DesignInterface::XML_PATH_THEME_ID,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-            $this->_storeManager->getStore()->getId()
-        );
-
-        $design = $this->_themeProvider->getThemeById($themeId);
-
+        $customerSession = Mage::getSingleton('customer/session');
+        $params['customer_group_id'] = $customerSession->getCustomerGroupId();
+        $design = Mage::getDesign();
         $params['design'] = $design->getPackageName().'_'.
             $design->getTheme('template');
 
@@ -204,9 +132,9 @@ class Block extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function useRecentlyViewedProducts()
     {
-        return (bool)$this->getConfigs(
+        return (bool)$this->scopeConfig->getValue(
             self::USE_RECENTLY_VIEWED_PRODUCTS_XML_PATH
-        );
+        , \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -223,10 +151,11 @@ class Block extends \Magento\Framework\App\Helper\AbstractHelper
                 $cacheTags[] = sha1('product_' . $product->getId());
             }
         } else if ($block instanceof \Magento\Cms\Block\Block ||
-        is_subclass_of($block, \Magento\Cms\Block\Block::class)) {
+        is_subclass_of($block, 'Mage_Cms_Block_Block')) {
             $cacheTags[] = sha1('cmsblock');
             $cacheTags[] = sha1('cmsblock_' . $block->getBlockId());
         }
         return $cacheTags;
     }
+
 }

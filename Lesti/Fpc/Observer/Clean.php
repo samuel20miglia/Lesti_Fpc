@@ -1,7 +1,4 @@
 <?php
-declare(strict_types=1);
-
-namespace Lesti\Fpc\Observer;
 /**
  * Lesti_Fpc (http:gordonlesti.com/lestifpc)
  *
@@ -14,51 +11,51 @@ namespace Lesti\Fpc\Observer;
  * @license   http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
 
-class Clean  implements ObserverInterface
+namespace Lesti\Fpc\Model\Observer;
+
+class Clean
 {
     const CACHE_TYPE = 'fpc';
 
-    protected $fpc;
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    protected $request;
 
     public function __construct(
-        //Module $moduleHelper,
-        //\Magento\Framework\Module\Manager $moduleManager,
-        //\Magento\Framework\View\Asset\Repository $assetRepo
-        \Lesti\Fpc\Model\Fpc $fpc
-        ) {
-            $this->fpc = $fpc;
-            //$this->moduleManager = $moduleManager;
-            //$this->assetRepo = $assetRepo;
+        \Magento\Framework\App\Request\Http $request
+    ) {
+        $this->request = $request;
     }
     /**
      * Cron job method to clean old cache resources
      */
-    public function coreCleanCache()
-    {
-        $this->fpc->getFrontend()->clean(\Zend_Cache::CLEANING_MODE_OLD);
-    }
+//     public function coreCleanCache()
+//     {
+//         $this->_getFpc()->getFrontend()->clean(\Zend_Cache::CLEANING_MODE_OLD);
+//     }
 
     public function adminhtmlCacheFlushAll()
     {
-        $this->fpc->clean();
+        //$this->_getFpc()->clean();
     }
 
     public function controllerActionPredispatchAdminhtmlCacheMassRefresh()
     {
-        $types = $this->getRequest()->getParam('types');
-        if ($this->fpc->isActive()) {
+        $types = $this->request->getParam('types');
+        if ($this->_getFpc()->isActive()) {
             if ((is_array($types) && in_array(self::CACHE_TYPE, $types)) ||
                 $types == self::CACHE_TYPE) {
-                $this->fpc->clean();
+                $this->_getFpc()->clean();
             }
         }
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @return Lesti_Fpc_Model_Fpc
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    protected function _getFpc()
     {
-
+        return Mage::getSingleton('fpc/fpc');
     }
 }

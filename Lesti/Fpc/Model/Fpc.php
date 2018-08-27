@@ -1,9 +1,4 @@
 <?php
-declare(strict_types=1);
-
-namespace Lesti\Fpc\Model;
-use Lesti\Fpc\Object\CacheItem;
-
 /**
  * Lesti_Fpc (http:gordonlesti.com/lestifpc)
  *
@@ -16,14 +11,12 @@ use Lesti\Fpc\Object\CacheItem;
  * @license   http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
 
+namespace Lesti\Fpc\Model;
+
 /**
- * Class Fpc
- *//**
- * @param \Magento\Framework\App\Helper\Context $context
- * @param \Magento\Customer\Model\Session $customerSession
- * @param CustomerViewHelper $customerViewHelper
+ * Class Lesti_Fpc_Model_Fpc
  */
-class Fpc
+class Fpc extends \Magento\Framework\App\CacheInterface
 {
     const GZCOMPRESS_LEVEL_XML_PATH = 'system/fpc/gzcompress_level';
     const CACHE_TAG = 'FPC';
@@ -52,42 +45,45 @@ class Fpc
     );
 
     /**
-     *
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $_scopeConfig;
-
-    /**
-     *
      * @var \Magento\Framework\Event\ManagerInterface
      */
-    protected $_eventManager;
+    protected $eventManager;
 
-    protected $_cacheTypeList;
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
 
-    protected $_cacheFrontendPool;
+    /**
+     * @var \Magento\Framework\DataObjectFactory
+     */
+    protected $dataObjectFactory;
 
+    /**
+     * @var \Lesti\Fpc\Model\Fpc\CacheItemFactory
+     */
+    protected $fpcFpcCacheItemFactory;
 
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Event\ManagerInterface $eventManager,
-        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
-        \Magento\Framework\App\Cache\Frontend\Pool $cacheFrontendPool
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\DataObjectFactory $dataObjectFactory,
+        \Lesti\Fpc\Model\Fpc\CacheItemFactory $fpcFpcCacheItemFactory
     )
     {
-        $this->_scopeConfig = $scopeConfig;
-        $this->_eventManager = $eventManager;
-        $this->_cacheFrontendPool = $cacheFrontendPool;
-        $this->_cacheTypeList = $cacheTypeList;
+        $this->dataObjectFactory = $dataObjectFactory;
+        $this->fpcFpcCacheItemFactory = $fpcFpcCacheItemFactory;
+        $this->eventManager = $eventManager;
+        $this->scopeConfig = $scopeConfig;
         /*
          * If the version of Zend Framework is older than 1.12, fallback to the
          * legacy cache settings.
          * See http://framework.zend.com/issues/browse/ZF-12047
          */
-        if (Zend_Version::compareVersion('1.12.0') > 0) {
+        if (\Zend_Version::compareVersion('1.12.0') > 0) {
             $this->_defaultBackendOptions = $this->_legacyDefaultBackendOptions;
         }
-        $node = $this->_scopeConfig->getNode('global/fpc');
+        $node = Mage::getConfig()->getNode('global/fpc');
         $options = array();
         if ($node) {
             $options = $node->asArray();
@@ -118,21 +114,21 @@ class Fpc
             $item->getContentType(),
         );
         // edit cached object
-        $cacheData = new \Magento\Framework\DataObject();
+        $cacheData = $this->dataObjectFactory->create();
         $cacheData->setCachedata($data);
         $cacheData->setCacheId($id);
         $cacheData->setTags($tags);
         $cacheData->setLifeTime($lifeTime);
-        $this->_eventManager->dispatchEvent(
+        $this->eventManager->dispatch(
             'fpc_save_data_before',
-            ['cache_data' => $cacheData]
+            array('cache_data' => $cacheData)
         );
         $data = $cacheData->getCachedata();
         $id = $cacheData->getCacheId();
         $tags = $cacheData->getTags();
         $lifeTime = $cacheData->getLifeTime();
 
-        $compressLevel = $this->_scopeConfig->getStoreConfig(self::GZCOMPRESS_LEVEL_XML_PATH);
+        $compressLevel = $this->scopeConfig->getValue(self::GZCOMPRESS_LEVEL_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $data = serialize($data);
         if ($compressLevel != -2) {
             $data = gzcompress($data, $compressLevel);
@@ -148,7 +144,7 @@ class Fpc
 
     /**
      * @param string $id
-     * @return boolean|\CacheItem
+     * @return boolean|\Lesti_Fpc_Model_Fpc_CacheItem
      */
     public function load($id)
     {
@@ -156,14 +152,14 @@ class Fpc
         if ($data === false) {
             return false;
         }
-        $compressLevel = $this->_scopeConfig->getStoreConfig(self::GZCOMPRESS_LEVEL_XML_PATH);
+        $compressLevel = $this->scopeConfig->getValue(self::GZCOMPRESS_LEVEL_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         if ($data !== false && $compressLevel != -2) {
             $data = gzuncompress($data);
         }
 
         $data = unserialize($data);
 
-        return new CacheItem($data[0], $data[1], $data[2]);
+        return $this->fpcFpcCacheItemFactory->create($data[0], $data[1], $data[2]);
     }
 
     /**
@@ -174,14 +170,14 @@ class Fpc
      */
     public function clean($tags=array())
     {
-        $mode = Zend_Cache::CLEANING_MODE_MATCHING_ANY_TAG;
+        $mode = \Zend_Cache::CLEANING_MODE_MATCHING_ANY_TAG;
         if (!empty($tags)) {
             if (!is_array($tags)) {
                 $tags = array($tags);
             }
             $res = $this->_frontend->clean($mode, $this->_tags($tags));
         } else {
-            $res = $this->_frontend->clean($mode, [self::CACHE_TAG]);
+            $res = $this->_frontend->clean($mode, array(self::CACHE_TAG));
             $res = $res &&
                 $this->_frontend->clean(
                     $mode,
@@ -196,8 +192,7 @@ class Fpc
      */
     public function isActive()
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        return $objectManager->useCache('fpc');
+        return Mage::app()->useCache('fpc');
     }
 
 }
