@@ -13,10 +13,12 @@
 
 namespace Lesti\Fpc\Helper;
 
+use Magento\Customer\Model\Session;
+
 /**
  * Class Lesti_Fpc_Helper_Data
  */
-class Data extends \Lesti_Fpc_Helper_Abstract
+class Data extends \Lesti\Fpc\Helper\AbstractData
 {
     const XML_PATH_CACHEABLE_ACTIONS = 'system/fpc/cache_actions';
     const XML_PATH_BYPASS_HANDLES = 'system/fpc/bypass_handles';
@@ -72,6 +74,17 @@ class Data extends \Lesti_Fpc_Helper_Abstract
      */
     protected $dataObjectFactory;
 
+    protected $session;
+
+    protected $collection;
+
+    /**
+     *
+     * @var \Magento\Framework\App\Cache\Manager
+     */
+    protected $cacheManager;
+
+
     public function __construct(
         \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Request\Http $request,
@@ -79,7 +92,10 @@ class Data extends \Lesti_Fpc_Helper_Abstract
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Event\ManagerInterface $eventManager,
         \Magento\Framework\View\LayoutInterface $layout,
-        \Magento\Framework\DataObjectFactory $dataObjectFactory
+        \Magento\Framework\DataObjectFactory $dataObjectFactory,
+        \Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection $collection,
+        \Magento\Framework\App\Cache\Manager $cacheManager,
+        Session $session
     ) {
         $this->dataObjectFactory = $dataObjectFactory;
         $this->registry = $registry;
@@ -88,6 +104,10 @@ class Data extends \Lesti_Fpc_Helper_Abstract
         $this->scopeConfig = $scopeConfig;
         $this->eventManager = $eventManager;
         $this->layout = $layout;
+        $this->session = $session;
+        $this->collection = $collection;
+        $this->cacheManager = $cacheManager;
+
     }
     /**
      * @return array
@@ -149,7 +169,7 @@ class Data extends \Lesti_Fpc_Helper_Abstract
                 }
             }
             if ($this->scopeConfig->getValue(self::XML_PATH_CUSTOMER_GROUPS, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
-                $customerSession = Mage::getSingleton('customer/session');
+                $customerSession = $this->session;
                 $params['customer_group_id'] = $customerSession
                     ->getCustomerGroupId();
             }
@@ -216,7 +236,7 @@ class Data extends \Lesti_Fpc_Helper_Abstract
         $currentFullActionName = $this->getFullActionName();
         if (in_array($currentFullActionName, self::$_pagesWithLayeredNavigation)) {
             /** @var \Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection $attributeCollection */
-            $attributeCollection = Mage::getResourceModel('catalog/product_attribute_collection');
+            $attributeCollection = $this->collection;
 
             // The category and search pages may have different filterable attributes, based on how the attributes
             // are configured
@@ -230,7 +250,9 @@ class Data extends \Lesti_Fpc_Helper_Abstract
                     $filterableField = 'is_filterable';
             }
 
-            $cache = Mage::app()->getCache();
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $fpc = $objectManager->create('\Lesti\Fpc\Model\Fpc');
+            $cache = $fpc;
             $cacheId = self::CACHE_KEY_LAYERED_NAVIGATION_ATTRIBUTES.'_'.$filterableField;
             $cacheTags = array('FPC', self::CACHE_KEY_LAYERED_NAVIGATION_ATTRIBUTES);
             $layeredNavigationAttributesCache = $cache->load($cacheId);
@@ -293,9 +315,10 @@ class Data extends \Lesti_Fpc_Helper_Abstract
     {
         $delimiter = '_';
         $request = $this->request;
-        return $request->getRequestedRouteName() . $delimiter .
-        $request->getRequestedControllerName() . $delimiter .
-        $request->getRequestedActionName();
+
+        return $request->getRouteName() . $delimiter
+        . $request->getControllerName() . $delimiter
+        . $request->getActionName();
     }
 
     /**

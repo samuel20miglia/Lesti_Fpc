@@ -13,10 +13,12 @@
 
 namespace Lesti\Fpc\Helper;
 
+use Magento\Customer\Model\Session;
+
 /**
  * Class Lesti_Fpc_Helper_Block
  */
-class Block extends \Lesti_Fpc_Helper_Abstract
+class Block extends \Lesti\Fpc\Helper\AbstractData
 {
     const DYNAMIC_BLOCKS_XML_PATH = 'system/fpc/dynamic_blocks';
     const LAZY_BLOCKS_XML_PATH = 'system/fpc/lazy_blocks';
@@ -39,14 +41,22 @@ class Block extends \Lesti_Fpc_Helper_Abstract
      */
     protected $scopeConfig;
 
+    protected $session;
+
+    protected $design;
+
     public function __construct(
         \Magento\Framework\App\Request\Http $request,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        Session $session,
+        \Magento\Framework\View\DesignInterface $design
     ) {
         $this->request = $request;
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
+        $this->session = $session;
+        $this->design = $design;
     }
     /**
      * @return array
@@ -70,7 +80,7 @@ class Block extends \Lesti_Fpc_Helper_Abstract
     public function areLazyBlocksValid()
     {
         $hash = $this->_getLazyBlocksValidHash();
-        $session = Mage::getSingleton('customer/session');
+        $session = $this->session;
         $sessionHash = $session->getData(self::LAZY_BLOCKS_VALID_SESSION_PARAM);
         if ($sessionHash === false || $hash != $sessionHash) {
             $session->setData(self::LAZY_BLOCKS_VALID_SESSION_PARAM, $hash);
@@ -98,9 +108,9 @@ class Block extends \Lesti_Fpc_Helper_Abstract
         if ($currencyCode) {
             $params['currency'] = $currencyCode;
         }
-        $customerSession = Mage::getSingleton('customer/session');
+        $customerSession = $this->session;
         $params['customer_group_id'] = $customerSession->getCustomerGroupId();
-        $design = Mage::getDesign();
+        $design = $this->design;
         $params['design'] = $design->getPackageName().'_'.
             $design->getTheme('template');
 

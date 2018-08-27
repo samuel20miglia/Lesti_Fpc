@@ -16,7 +16,7 @@ namespace Lesti\Fpc\Model;
 /**
  * Class Lesti_Fpc_Model_Fpc
  */
-class Fpc extends \Magento\Framework\App\CacheInterface
+class Fpc extends \Magento\Framework\App\Cache
 {
     const GZCOMPRESS_LEVEL_XML_PATH = 'system/fpc/gzcompress_level';
     const CACHE_TAG = 'FPC';
@@ -68,7 +68,8 @@ class Fpc extends \Magento\Framework\App\CacheInterface
         \Magento\Framework\Event\ManagerInterface $eventManager,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\DataObjectFactory $dataObjectFactory,
-        \Lesti\Fpc\Model\Fpc\CacheItemFactory $fpcFpcCacheItemFactory
+        \Lesti\Fpc\Model\Fpc\CacheItemFactory $fpcFpcCacheItemFactory,
+        \Magento\Framework\App\Cache\Frontend\Pool $pool
     )
     {
         $this->dataObjectFactory = $dataObjectFactory;
@@ -83,12 +84,12 @@ class Fpc extends \Magento\Framework\App\CacheInterface
         if (\Zend_Version::compareVersion('1.12.0') > 0) {
             $this->_defaultBackendOptions = $this->_legacyDefaultBackendOptions;
         }
-        $node = Mage::getConfig()->getNode('global/fpc');
-        $options = array();
-        if ($node) {
-            $options = $node->asArray();
-        }
-        parent::__construct($options);
+//         $node = $this->scopeConfig->getValue('global/fpc');
+//         $options = array();
+//         if ($node) {
+//             $options = $node->asArray();
+//         }
+           parent::__construct($pool);
     }
 
     /**
@@ -134,7 +135,7 @@ class Fpc extends \Magento\Framework\App\CacheInterface
             $data = gzcompress($data, $compressLevel);
         }
 
-        return $this->_frontend->save(
+        return $this->getFrontend()->save(
             $data,
             $this->_id($id),
             $this->_tags($tags),
@@ -171,20 +172,20 @@ class Fpc extends \Magento\Framework\App\CacheInterface
     public function clean($tags=array())
     {
         $mode = \Zend_Cache::CLEANING_MODE_MATCHING_ANY_TAG;
-        if (!empty($tags)) {
+        if ($tags) {
             if (!is_array($tags)) {
                 $tags = array($tags);
             }
-            $res = $this->_frontend->clean($mode, $this->_tags($tags));
+            $result = $this->_frontend->clean($mode, $this->_tags($tags));
         } else {
-            $res = $this->_frontend->clean($mode, array(self::CACHE_TAG));
-            $res = $res &&
-                $this->_frontend->clean(
-                    $mode,
-                    array(Mage_Core_Model_Config::CACHE_TAG)
-                );
+            /** @var $cacheFrontend \Magento\Framework\Cache\FrontendInterface */
+            foreach ($this->_frontendPool as $cacheFrontend) {
+                if ($cacheFrontend->clean()) {
+                    $result = true;
+                }
+            }
         }
-        return $res;
+        return $result;
     }
 
     /**
@@ -192,7 +193,9 @@ class Fpc extends \Magento\Framework\App\CacheInterface
      */
     public function isActive()
     {
-        return Mage::app()->useCache('fpc');
+        return true;
     }
+
+
 
 }

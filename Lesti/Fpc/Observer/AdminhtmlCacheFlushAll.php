@@ -12,27 +12,6 @@ use Magento\Framework\Event\Observer;
 class AdminhtmlCacheFlushAll implements ObserverInterface
 {
 
-    const CACHE_TYPE = 'fpc';
-
-    /**
-     *
-     * @var \Magento\Framework\App\Request\Http
-     */
-    protected $request;
-
-    /**
-     *
-     * @var \Lesti\Fpc\Model\Fpc
-     *
-     */
-    protected $fpc;
-
-    public function __construct(\Magento\Framework\App\Request\Http $request, \Lesti\Fpc\Model\Fpc $fpc)
-    {
-        $this->request = $request;
-        $this->fpc = $fpc;
-    }
-
     /**
      *
      * {@inheritdoc}
@@ -41,7 +20,9 @@ class AdminhtmlCacheFlushAll implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $this->fpc->clean();
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $fpc = $objectManager->create('\Lesti\Fpc\Model\Fpc');
+        $fpc->clean();
     }
 }
 

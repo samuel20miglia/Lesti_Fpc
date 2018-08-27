@@ -39,7 +39,7 @@ class Messages extends \Magento\Framework\App\Helper\AbstractHelper
         $block = $layout->getMessagesBlock();
         if ($block) {
             foreach ($messagesStorage as $storageName) {
-                $storage = Mage::getSingleton($storageName);
+                $storage = $this->_objectManager->get($storageName);
                 if ($storage) {
                     $block->addMessages($storage->getMessages(true));
                     $block->setEscapeMessageFlag(
@@ -47,11 +47,9 @@ class Messages extends \Magento\Framework\App\Helper\AbstractHelper
                     );
                 } else {
                     throw new \Magento\Framework\Exception\LocalizedException(
-                        Mage::helper('core')->__(
                             'Invalid messages storage "%s" for layout '.
                             'messages initialization',
                             (string)$storageName
-                        )
                     );
                 }
             }

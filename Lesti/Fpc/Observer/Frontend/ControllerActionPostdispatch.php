@@ -1,5 +1,5 @@
 <?php
-namespace Fpc\Observer\Frontend;
+namespace Lesti\Fpc\Observer\Frontend;
 
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;

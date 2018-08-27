@@ -36,7 +36,7 @@ class Gzcompress
      */
     public function toArray()
     {
-        $options = array(-2 => Mage::helper('fpc')->__('No'));
+        $options = array(-2 => __('No'));
         for ($i=0; $i <10; $i++) {
             $options[$i] = $i;
         }

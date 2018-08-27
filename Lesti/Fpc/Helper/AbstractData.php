@@ -48,7 +48,6 @@ abstract class AbstractData extends \Magento\Framework\App\Helper\AbstractHelper
         if ($configs) {
             return array_unique(array_map('trim', explode(',', $configs)));
         }
-
-        return array();
+        return [];
     }
 }
