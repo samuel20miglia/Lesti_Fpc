@@ -11,7 +11,7 @@
  * @license   http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
 
-namespace Lesti\Fpc\Model\System\Config\Source;
+namespace Lesti\Fpc\Model\Adminhtml\System\Config\Source;
 
 /**
  * Class Lesti_Fpc_Model_Adminhtml_System_Config_Source_Gzcompress

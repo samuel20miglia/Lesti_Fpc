@@ -29,14 +29,26 @@ class Ajax extends \Magento\Framework\View\Element\Template
      */
     protected $registry;
 
+    protected $_fpc;
+
+    protected $_helperData;
+
+    protected $_helperBlock;
+
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Registry $registry,
+        \Lesti\Fpc\Model\Fpc $fpc,
+        \Lesti\Fpc\Helper\Data $helperData,
+        \Lesti\Fpc\Helper\Block $helperBlock,
         array $data = []
     ) {
         $this->storeManager = $storeManager;
         $this->registry = $registry;
+        $this->_fpc = $fpc;
+        $this->_helperData = $helperData;
+        $this->_helperBlock = $helperBlock;
         parent::__construct(
             $context,
             $data
@@ -49,12 +61,12 @@ class Ajax extends \Magento\Framework\View\Element\Template
     public function getAjaxUrl()
     {
         $id = $this->_getProductId();
-        if (Mage::getSingleton('fpc/fpc')->isActive() &&
+        if ($this->_fpc->isActive() &&
             in_array(
                 'catalog_product_view',
-                Mage::helper('fpc')->getCacheableActions()
+                $this->_helperData->getCacheableActions()
             ) &&
-            Mage::helper('fpc/block')->useRecentlyViewedProducts() &&
+            $this->_helperBlock->useRecentlyViewedProducts() &&
             $id
         ) {
             return $this->getUrl(

@@ -101,7 +101,7 @@ class Fpc extends \Magento\Framework\App\Cache
      * @param int $lifeTime
      * @return bool
      */
-    public function save($item, $id, $tags=array(), $lifeTime=null)
+    public function save($item, $id, $tags=[], $lifeTime=null)
     {
         if (!in_array(self::CACHE_TAG, $tags)) {
             $tags[] = self::CACHE_TAG;
@@ -122,7 +122,7 @@ class Fpc extends \Magento\Framework\App\Cache
         $cacheData->setLifeTime($lifeTime);
         $this->eventManager->dispatch(
             'fpc_save_data_before',
-            array('cache_data' => $cacheData)
+            ['cache_data' => $cacheData]
         );
         $data = $cacheData->getCachedata();
         $id = $cacheData->getCacheId();
@@ -137,8 +137,8 @@ class Fpc extends \Magento\Framework\App\Cache
 
         return $this->getFrontend()->save(
             $data,
-            $this->_id($id),
-            $this->_tags($tags),
+            $id,
+            $tags,
             $lifeTime
         );
     }
@@ -176,7 +176,7 @@ class Fpc extends \Magento\Framework\App\Cache
             if (!is_array($tags)) {
                 $tags = array($tags);
             }
-            $result = $this->_frontend->clean($mode, $this->_tags($tags));
+            $result = $this->_frontend->clean($mode, $tags);
         } else {
             /** @var $cacheFrontend \Magento\Framework\Cache\FrontendInterface */
             foreach ($this->_frontendPool as $cacheFrontend) {
