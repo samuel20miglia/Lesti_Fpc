@@ -1,12 +1,11 @@
-# Lesti_Fpc
+# Lesti_Fpc Magento 2
 
-[![Latest Release][ico-version]][link-release]
 [![Software License][ico-license]](LICENSE.md)
-[![Build Status][ico-travis]][link-travis]
-[![Coverage Status][ico-coverall]][link-coveralls]
 
-Simple Magento Fullpagecache. The current documentation can be found
+Simple Magento Fullpagecache for magento 2.*. That is a porting from
 [here](https://gordonlesti.com/lesti-fpc-documentationversion-1-4-5/).
+
+The current documentation can be found [here](https://gordonlesti.com/lesti-fpc-documentationversion-1-4-5/).
 
 ## Install
 
@@ -14,7 +13,7 @@ Several quick start options are available:
 ### Install manually
   * [Download the latest release](https://github.com/samuel20miglia/Lesti_Fpc/releases/latest)
   * Unzip
-  * Copy `app` directory into Magento
+  * Copy `Lesti` directory into app/code/ folder
 
 ### Install with [modman](https://github.com/colinmollenhour/modman)
 
@@ -27,7 +26,7 @@ modman clone https://github.com/samuel20miglia/Lesti_Fpc.git
 ```json
 {
     "require": {
-        "samuel20miglia/lesti_fpc": "*"
+        "samuel20miglia/lesti-fpc": "*"
     }
 }
 ```
@@ -42,24 +41,19 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) and [CONDUCT](CONDUCT.md) for details
 
 ## Security
 
-If you discover any security related issues, please email info@gordonlesti.com instead of using the issue tracker.
+If you discover any security related issues, please use the issue tracker.
 
 ## Credits
 
-- [Gordon Lesti][link-author]
+- [Gordon Lesti](https://gordonlesti.com/)
+- [Samuel Ventimiglia][link-author]
 - [All Contributors][link-contributors]
 
 ## License
 
 The Open Software License v. 3.0 (OSL-3.0). Please see [License File](LICENSE.md) for more information.
 
-[ico-version]: https://img.shields.io/github/release/GordonLesti/Lesti_Fpc.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-OSL--3.0-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/GordonLesti/Lesti_Fpc/master.svg?style=flat-square
-[ico-coverall]: https://img.shields.io/coveralls/GordonLesti/Lesti_Fpc/master.svg?style=flat-square
-
 [link-release]: https://github.com/samuel20miglia/Lesti_Fpc/releases/latest
-[link-travis]: https://travis-ci.org/GordonLesti/Lesti_Fpc
-[link-coveralls]: https://coveralls.io/r/GordonLesti/Lesti_Fpc
 [link-author]: http://samuelventimiglia.it/
 [link-contributors]: ../../contributors
