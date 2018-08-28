@@ -33,5 +33,6 @@
 			"type" : "composer",
 			"url" : "https://packages.firegento.com/"
 		}
-	]
+	],
+	"minimum-stability" : "dev"
 }
