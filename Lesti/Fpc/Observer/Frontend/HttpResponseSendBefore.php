@@ -100,7 +100,7 @@ class HttpResponseSendBefore implements ObserverInterface
     public function execute(Observer $observer)
     {
         $response = $observer->getControllerAction()->getResponse();
-        if ($this->_getFpc()->isActive() && ! $this->_cached && $this->_helperData->canCacheRequest() && $response->getHttpResponseCode() == 200) {
+        if ($this->fpc->isActive() && ! $this->_cached && $this->_helperData->canCacheRequest() && $response->getHttpResponseCode() == 200) {
             $fullActionName = $this->_helperData->getFullActionName();
             $cacheableActions = $this->_helperData->getCacheableActions();
             if (in_array($fullActionName, $cacheableActions)) {

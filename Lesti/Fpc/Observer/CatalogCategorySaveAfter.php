@@ -3,6 +3,7 @@ namespace Lesti\Fpc\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
+use Magento\Framework\Registry;
 
 /**
  *
@@ -21,12 +22,22 @@ class CatalogCategorySaveAfter implements ObserverInterface
 
     /**
      *
+     * @var use Magento\Framework\Registry;
+     */
+    protected $registry;
+
+    /**
+     *
      * @param \Lesti\Fpc\Model\Fpc $fpc
      */
-    public function __construct(\Lesti\Fpc\Model\Fpc $fpc)
+    public function __construct(
+        \Lesti\Fpc\Model\Fpc $fpc,
+        \Magento\Framework\Registry $registry)
     {
         $this->fpc = $fpc;
+        $this->registry = $registry;
     }
+
 
     /**
      *

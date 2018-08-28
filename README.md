@@ -26,7 +26,7 @@ modman clone https://github.com/samuel20miglia/Lesti_Fpc.git
 ```json
 {
     "require": {
-        "samuel20miglia/lesti-fpc": "*"
+        "samuel20miglia/lesti_fpc": "*"
     }
 }
 ```

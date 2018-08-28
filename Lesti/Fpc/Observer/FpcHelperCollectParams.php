@@ -67,8 +67,8 @@ class FpcHelperCollectParams implements ObserverInterface
         }
         // design
         $design = $this->_design;
-        $params['design'] = $design->getPackageName().'_'.
-            $design->getTheme('template');
+        $params['design'] = $design->getLocale() . '_' .
+            $design->getDesignTheme()->getId();
             // session paramaters
             /** @var Lesti_Fpc_Helper_Data $helper */
             $helper = $this->_helperData;

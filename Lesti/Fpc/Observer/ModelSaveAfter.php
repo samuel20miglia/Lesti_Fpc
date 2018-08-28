@@ -58,7 +58,7 @@ class ModelSaveAfter implements ObserverInterface
      */
     protected function _cmsBlockSaveAfter(\Magento\Cms\Model\Block $block)
     {
-        $this->_getFpc()->clean(sha1('cmsblock_' . $block->getIdentifier()));
+        $this->fpc->clean(sha1('cmsblock_' . $block->getIdentifier()));
     }
 
     /**

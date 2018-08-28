@@ -91,7 +91,7 @@ class FpcObserverCollectCacheTags implements ObserverInterface
      */
     protected function getCmsIndexIndexCacheTags()
     {
-        $cacheTags = array();
+        $cacheTags = [];
         $cacheTags[] = sha1('cms');
         $pageId = $this->scopeConfig->getValue(\Magento\Cms\Helper\Page::XML_PATH_HOME_PAGE, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         if ($pageId) {
@@ -107,7 +107,7 @@ class FpcObserverCollectCacheTags implements ObserverInterface
      */
     protected function getCmsPageViewCacheTags(\Magento\Framework\App\Request\Http $request)
     {
-        $cacheTags = array();
+        $cacheTags = [];
         $cacheTags[] = sha1('cms');
         $pageId = $request->getParam('page_id', $request->getParam('id', false));
         if ($pageId) {
@@ -129,42 +129,44 @@ class FpcObserverCollectCacheTags implements ObserverInterface
         if ($productId) {
             $cacheTags[] = sha1('product_' . $productId);
 
-            // configurable product
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
             // configurable product
-            $configurableProduct = $objectManager->get('Magento\Catalog\Model\ResourceModel\Product\Collection');
+            $configProduct = $objectManager->create('Magento\Catalog\Model\Product')->load($productId);
+            $childIds = $configProduct->getTypeInstance()->getUsedProducts($configProduct);
+
             // get all childs of this product and add the cache tag
-            $childIds = $configurableProduct->getChildrenIds($productId);
             foreach ($childIds as $childIdGroup) {
                 foreach ($childIdGroup as $childId) {
                     $cacheTags[] = sha1('product_' . $childId);
                 }
             }
             // get all parents of this product and add the cache tag
-            $parentIds = $configurableProduct->getParentIdsByChild($productId);
+            $parentIds = $configProduct->getTypeInstance()->getParentIdsByChild($productId);
             foreach ($parentIds as $parentId) {
                 $cacheTags[] = sha1('product_' . $parentId);
             }
 
             // grouped product
-            // grouped product
-            $groupedProduct = $this->productCollectionFactory->create()
+            $groupedProduct = $this->_productCollectionFactory->create()
                 ->addAttributeToSelect('*')
                 ->addAttributeToFilter('type_id', [
                 'eq' => 'grouped'
             ]);
+
+            //$childGroupedIds = $groupedProduct->getTypeInstance()->getUsedProducts($configProduct);
             // get all childs of this product and add the cache tag
-            $childIds = $groupedProduct->getChildrenIds($productId);
-            foreach ($childIds as $childIdGroup) {
-                foreach ($childIdGroup as $childId) {
-                    $cacheTags[] = sha1('product_' . $childId);
-                }
-            }
+            //$childIds = $groupedProduct->getChildrenIds($productId);
+//             foreach ($childIds as $childIdGroup) {
+//                 foreach ($childIdGroup as $childId) {
+//                     $cacheTags[] = sha1('product_' . $childId);
+//                 }
+//             }
             // get all parents of this product and add the cache tag
-            $parentIds = $groupedProduct->getParentIdsByChild($productId);
-            foreach ($parentIds as $parentId) {
-                $cacheTags[] = sha1('product_' . $parentId);
-            }
+//             $parentIds = $groupedProduct->getParentIdsByChild($productId);
+//             foreach ($parentIds as $parentId) {
+//                 $cacheTags[] = sha1('product_' . $parentId);
+//             }
 
             $categoryId = (int) $request->getParam('category', false);
             if ($categoryId) {
@@ -182,7 +184,7 @@ class FpcObserverCollectCacheTags implements ObserverInterface
      */
     protected function getCatalogCategoryViewCacheTags(\Magento\Framework\App\Request\Http $request)
     {
-        $cacheTags = array();
+        $cacheTags = [];
         $cacheTags[] = sha1('category');
         $categoryId = (int) $request->getParam('id', false);
         if ($categoryId) {
