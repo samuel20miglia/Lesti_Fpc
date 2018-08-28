@@ -107,13 +107,14 @@ class Fpc extends \Magento\Framework\App\Cache
             $tags[] = self::CACHE_TAG;
         }
         if (is_null($lifeTime)) {
-            $lifeTime = (int) $this->getFrontend()->getOption('lifetime');
+            $lifeTime = (int) $this->scopeConfig->getValue('lifetime');
         }
-        $data = array(
-            $item->getContent(),
-            $item->getTime(),
-            $item->getContentType(),
-        );
+
+        $data = [
+            array($item),
+            $item,
+            $item
+        ];
         // edit cached object
         $cacheData = $this->dataObjectFactory->create();
         $cacheData->setCachedata($data);
@@ -160,7 +161,7 @@ class Fpc extends \Magento\Framework\App\Cache
 
         $data = unserialize($data);
 
-        return $this->fpcFpcCacheItemFactory->create($data[0], $data[1], $data[2]);
+        return $this->fpcFpcCacheItemFactory->create($data, $data[1], $data[2]);
     }
 
     /**

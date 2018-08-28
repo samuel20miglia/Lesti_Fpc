@@ -39,13 +39,18 @@ class CoreBlockAbstractToHtmlAfter implements ObserverInterface
 
     protected $_helperBlock;
 
+    private static $_transportObject;
+
     /**
      *
      * @param \Lesti\Fpc\Model\Fpc $fpc
      * @param \Lesti\Fpc\Helper\Data $helperData
      * @param \Lesti\Fpc\Helper\Block $helperBlock
      */
-    public function __construct(\Lesti\Fpc\Model\Fpc $fpc, \Lesti\Fpc\Helper\Data $helperData, \Lesti\Fpc\Helper\Block $helperBlock)
+    public function __construct(
+        \Lesti\Fpc\Model\Fpc $fpc,
+        \Lesti\Fpc\Helper\Data $helperData,
+        \Lesti\Fpc\Helper\Block $helperBlock)
     {
         $this->fpc = $fpc;
         $this->_helperData = $helperData;
@@ -72,10 +77,10 @@ class CoreBlockAbstractToHtmlAfter implements ObserverInterface
                 $this->_cacheTags = array_merge($this->_helperBlock->getCacheTags($block), $this->_cacheTags);
                 if (in_array($blockName, $dynamicBlocks)) {
                     $placeholder = $this->_helperBlock->getPlaceholderHtml($blockName);
-                    $html = $observer->getTransport()->getHtml();
-                    $this->_html[] = $html;
+                    //$html = $observer->getEvent()->getTransport();
+                    //$this->_html[] = $html;
                     $this->_placeholder[] = $placeholder;
-                    $observer->getTransport()->setHtml($placeholder);
+                    //$observer->getEvent()->getTransport()->setHtml($placeholder);
                 }
             }
         }

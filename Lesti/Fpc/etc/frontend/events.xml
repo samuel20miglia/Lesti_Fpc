@@ -3,16 +3,16 @@
     <event name="controller_action_postdispatch">
         <observer name="fpc_controller_action_postdispatch" instance="Lesti\Fpc\Observer\Frontend\ControllerActionPostdispatch"/>
     </event>
-    <event name="controller_action_layout_generate_blocks_before">
+    <event name="controller_action_layout_render_before">
         <observer name="fpc_controller_action_layout_generate_blocks_before" instance="Lesti\Fpc\Observer\Frontend\ControllerActionLayoutGenerateBlocksBefore"/>
     </event>
-    <event name="http_response_send_before">
+    <event name="controller_action_predispatch">
         <observer name="fpc_http_response_send_before" instance="Lesti\Fpc\Observer\Frontend\HttpResponseSendBefore"/>
     </event>
-    <event name="core_block_abstract_to_html_after">
+     <event name="view_block_abstract_to_html_before">
         <observer name="fpc_core_block_abstract_to_html_after" instance="Lesti\Fpc\Observer\Frontend\CoreBlockAbstractToHtmlAfter"/>
     </event>
-    <event name="core_block_messages_get_grouped_html_after">
+    <event name="view_message_block_render_grouped_html_after">
         <observer name="fpc_core_block_messages_get_grouped_html_after" instance="Lesti\Fpc\Observer\Frontend\CoreBlockAbstractToHtmlAfter"/>
     </event>
 </config>

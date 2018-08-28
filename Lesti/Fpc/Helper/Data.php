@@ -220,7 +220,7 @@ class Data extends \Lesti\Fpc\Helper\AbstractData
             $layeredNavigationParams = array();
         }
 
-        return array_merge($configParams, $layeredNavigationParams);
+        return array_merge($configParams, (array) $layeredNavigationParams);
     }
 
     /**
@@ -264,7 +264,8 @@ class Data extends \Lesti\Fpc\Helper\AbstractData
                 }
                 $cache->save(serialize($layeredNavigationAttributes), $cacheId, $cacheTags);
             } else {
-                $layeredNavigationAttributes = unserialize($layeredNavigationAttributesCache);
+
+                $layeredNavigationAttributes = $layeredNavigationAttributesCache;
             }
         }
 
@@ -327,7 +328,7 @@ class Data extends \Lesti\Fpc\Helper\AbstractData
      */
     public function getContentType(\Magento\Framework\App\Response\Http $response)
     {
-        foreach ($response->getHeaders() as $header) {
+        foreach ($response->getHeaders()->toArray() as $header) {
             if (isset($header['name']) && $header['name'] === 'Content-Type' && isset($header['value'])) {
                 return $header['value'];
             }

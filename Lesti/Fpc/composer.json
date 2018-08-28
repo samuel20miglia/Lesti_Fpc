@@ -21,13 +21,7 @@
 	"authors" : [{
 			"name" : "Samuel Ventimiglia",
 			"email" : "samuel@vegans.it",
-			"homepage" : "http://samuelventimiglia.it/",
 			"role" : "dev"
-		}, {
-			"name" : "Gordon Lesti",
-			"email" : "info@gordonlesti.com",
-			"homepage" : "http://gordonlesti.com/",
-			"role" : "developer"
 		}
 	]
 }
