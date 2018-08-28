@@ -1,5 +1,0 @@
-config:
-    default/system/fpc/dynamic_blocks: >
-     messages,
-     global_messages, global_notices
-      , global_messages

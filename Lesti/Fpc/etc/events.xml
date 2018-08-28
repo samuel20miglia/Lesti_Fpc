@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_save_after">
+        <observer name="fpc_catalog_product_save_after" instance="Lesti\Fpc\Observer\CatalogProductSaveAfter"/>
+    </event>
+    <event name="catalog_category_save_after">
+        <observer name="fpc_catalog_category_save_after" instance="Lesti\Fpc\Observer\CatalogCategorySaveAfter"/>
+    </event>
+    <event name="cms_page_save_after">
+        <observer name="fpc_cms_page_save_after" instance="Lesti\Fpc\Observer\CmsPageSaveAfter"/>
+    </event>
+    <event name="model_save_after">
+        <observer name="fpc_model_save_after" instance="Lesti\Fpc\Observer\ModelSaveAfter"/>
+    </event>
+    <event name="review_delete_after">
+        <observer name="fpc_review_delete_after" instance="Lesti\Fpc\Observer\ReviewDeleteAfter"/>
+    </event>
+    <event name="review_save_after">
+        <observer name="fpc_review_save_after" instance="Lesti\Fpc\Observer\ReviewSaveAfter"/>
+    </event>
+    <event name="core_clean_cache">
+        <observer name="fpc_core_clean_cache" instance="Lesti\Fpc\Observer\CoreCleanCache"/>
+    </event>
+    <event name="adminhtml_cache_flush_all">
+        <observer name="fpc_adminhtml_cache_flush_all" instance="Lesti\Fpc\Observer\AdminhtmlCacheFlushAll"/>
+    </event>
+    <event name="cataloginventory_stock_item_save_after">
+        <observer name="fpc_cataloginventory_stock_item_save_after" instance="Lesti\Fpc\Observer\CataloginventoryStockItemSaveAfter"/>
+    </event>
+    <event name="fpc_helper_collect_params">
+        <observer name="fpc_fpc_helper_collect_params" instance="Lesti\Fpc\Observer\FpcHelperCollectParams"/>
+    </event>
+    <event name="fpc_observer_collect_cache_tags">
+        <observer name="fpc_fpc_observer_collect_cache_tags" instance="Lesti\Fpc\Observer\FpcObserverCollectCacheTags"/>
+    </event>
+</config>
