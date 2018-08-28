@@ -22,11 +22,11 @@ modman clone https://github.com/samuel20miglia/Lesti_Fpc.git
 ```
 
 ### Install with [Magento Composer Installer](https://github.com/Cotya/magento-composer-installer)
-  * add the requirement `samuel20miglia/lesti-fpc`
+  * add the requirement `samuel20miglia/lesti_fpc`
 ```json
 {
     "require": {
-        "samuel20miglia/lesti-fpc": "*"
+        "samuel20miglia/lesti_fpc": "*"
     }
 }
 ```
