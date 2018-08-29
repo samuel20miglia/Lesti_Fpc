@@ -62,7 +62,8 @@ class FpcObserverCollectCacheTags implements ObserverInterface
         /** @var Lesti_Fpc_Helper_Data $helper */
         $helper = $this->_helperData;
         $fullActionName = $helper->getFullActionName();
-        $cacheTags = array();
+        $cacheTags = [];
+
         $request = $this->request;
         switch ($fullActionName) {
             case 'cms_index_index':
@@ -154,19 +155,14 @@ class FpcObserverCollectCacheTags implements ObserverInterface
                 'eq' => 'grouped'
             ]);
 
-            //$childGroupedIds = $groupedProduct->getTypeInstance()->getUsedProducts($configProduct);
             // get all childs of this product and add the cache tag
-            //$childIds = $groupedProduct->getChildrenIds($productId);
-//             foreach ($childIds as $childIdGroup) {
-//                 foreach ($childIdGroup as $childId) {
-//                     $cacheTags[] = sha1('product_' . $childId);
-//                 }
-//             }
-            // get all parents of this product and add the cache tag
-//             $parentIds = $groupedProduct->getParentIdsByChild($productId);
-//             foreach ($parentIds as $parentId) {
-//                 $cacheTags[] = sha1('product_' . $parentId);
-//             }
+            // $childIds = $groupedProduct->getChildrenIds($productId);
+            // foreach ($childIds as $childIdGroup) {
+
+            foreach ($groupedProduct as $childId) {
+                $cacheTags[] = sha1('product_' . $childId);
+            }
+            //}
 
             $categoryId = (int) $request->getParam('category', false);
             if ($categoryId) {

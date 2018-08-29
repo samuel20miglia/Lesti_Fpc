@@ -39,10 +39,10 @@ class CmsPageSaveAfter implements ObserverInterface
         if ($this->fpc->isActive()) {
             $page = $observer->getEvent()->getObject();
             if ($page->getId()) {
-                $tags = array(
+                $tags = [
                     sha1('cms_' . $page->getId()),
                     sha1('cms_' . $page->getIdentifier())
-                );
+                ];
                 $this->fpc->clean($tags, \Zend_Cache::CLEANING_MODE_MATCHING_ANY_TAG);
             }
         }
