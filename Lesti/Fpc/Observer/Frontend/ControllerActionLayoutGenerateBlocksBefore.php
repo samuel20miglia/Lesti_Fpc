@@ -22,11 +22,18 @@ class ControllerActionLayoutGenerateBlocksBefore implements ObserverInterface
     protected $_html = [];
     protected $_placeholder = [];
     protected $_cacheTags = [];
+
     /**
      *
      * @var \Magento\Framework\App\Request\Http
      */
     protected $request;
+
+    /**
+     *
+     * @var \Magento\Framework\App\Response\Http
+     */
+    protected $response;
 
     /**
      *
@@ -48,6 +55,11 @@ class ControllerActionLayoutGenerateBlocksBefore implements ObserverInterface
     protected $session;
 
     protected $_coreSession;
+    /**
+     *
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
 
     /**
      *
@@ -60,19 +72,23 @@ class ControllerActionLayoutGenerateBlocksBefore implements ObserverInterface
      */
     public function __construct(
         \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\App\Response\Http $response,
         \Lesti\Fpc\Model\Fpc $fpc,
         \Lesti\Fpc\Helper\Data $helperData,
         \Lesti\Fpc\Helper\Block $helperBlock,
         Session $customerSession,
         \Lesti\Fpc\Helper\Block\Messages $helperMessages,
-        \Magento\Framework\Session\SessionManagerInterface $coreSession)
+        \Magento\Framework\Session\SessionManagerInterface $coreSession,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig)
     {
         $this->request = $request;
+        $this->response = $response;
         $this->fpc = $fpc;
         $this->_helperData = $helperData;
         $this->_helperBlock = $helperBlock;
         $this->_helperMessages = $helperMessages;
         $this->_coreSession = $coreSession;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -83,7 +99,7 @@ class ControllerActionLayoutGenerateBlocksBefore implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $controller = $observer->getControllerAction();
+
         if ($this->fpc->isActive() && ! $this->_cached && $this->_helperData->canCacheRequest()) {
             $key = $this->_helperData->getKey();
             if ($object = $this->fpc->load($key)) {
@@ -112,19 +128,18 @@ class ControllerActionLayoutGenerateBlocksBefore implements ObserverInterface
                 $this->_replaceFormKey();
                 $body = str_replace($this->_placeholder, $this->_html, $body);
                 if ($this->scopeConfig->getValue(self::SHOW_AGE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
-                    $controller->getResponse()->setHeader('Age', time() - $time);
+                    $this->response->setHeader('Age', time() - $time);
                 }
-                $controller->getResponse()->setHeader('Content-Type', $object->getContentType(), true);
-                $response = $controller->getResponse();
-                $response->setBody($body);
+                $this->response->setHeader('Content-Type', $object->getContentType(), true);
+                $this->response->setBody($body);
                 $this->eventManager->dispatch('fpc_http_response_send_before', array(
-                    'response' => $response
+                    'response' => $this->response
                 ));
-                $response->sendResponse();
+                $this->response->sendResponse();
                 exit();
             }
             if ($this->scopeConfig->getValue(self::SHOW_AGE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
-                $controller->getResponse()->setHeader('Age', 0);
+                $this->response->setHeader('Age', 0);
             }
         }
     }

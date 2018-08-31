@@ -36,6 +36,7 @@ class CatalogCategorySaveAfter implements ObserverInterface
     {
         $this->fpc = $fpc;
         $this->registry = $registry;
+        parent::__construct($this->registry);
     }
 
 
